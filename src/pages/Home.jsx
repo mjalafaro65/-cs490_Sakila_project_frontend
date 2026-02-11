@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import api from '../axios.jsx';
 
 
-
+//runs first 
 function Home() {
   const [films, setFilms]=useState([]);
-
-  // when component(whats in return) loads
+  
+  
+  //doesn't run until component(whats in return) loads
   useEffect(()=>{
 
     const fetchedFilms= async ()=>{
@@ -39,7 +40,7 @@ function Home() {
           films.map((film)=>(
             // needs unique key to track each item(useful for re-rendering)
             <li key={film.film_id}> 
-              <strong>{film.title}</strong>-  {film.rental_count}
+              <strong>{film.title}</strong>- {film.rental_count}
             </li>
           ))
         }
