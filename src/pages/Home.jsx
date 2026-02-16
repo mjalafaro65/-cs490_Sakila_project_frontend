@@ -55,6 +55,7 @@ function Home() {
     
   },[]);
 
+    // for testing
     console.log("Actors array:", actors);
    
     const fetchFilmDetails = async (film_Id) => {
@@ -62,6 +63,8 @@ function Home() {
         const response = await api.get(`/films/${film_Id}`);
         setFilmDetails(response.data);
         setFilmPopUp(true);
+
+        console.log("Film details:", response.data);
 
       } catch (error){
         console.error("Error fetching film details:", error);
@@ -132,8 +135,6 @@ function Home() {
                   onClick={() => {
                   console.log("Actor ID clicked:", actor.actor_id);
                   fetchActorDetails(actor.actor_id)
-                  /*this is NOT working because actor ID is not being returned; therefore, no information
-                  can be found and this popup does not appear*/
                   }}
                   style={{ cursor: "pointer", background: "none", 
                   border: "none", color: "black", textDecoration: "underline"}}> 
@@ -169,7 +170,7 @@ function Home() {
             <h2>{filmDetails.title}</h2>
             <p><strong>Release Year:</strong> {filmDetails.release_year}</p>
             <p><strong>Description:</strong> {filmDetails.description}</p>
-            <p><strong>Rental Count:</strong> {filmDetails.rental_count}</p>
+            <p><strong>Rating:</strong> {filmDetails.rating}</p>
             <button onClick={() => setFilmPopUp(false)}>Close</button>
           </div>
         </div>
@@ -180,7 +181,7 @@ function Home() {
           position: "fixed",
           top: 0,
           left: 0,
-          width: "100%",
+          width: "100%", 
           height: "100%",
           backgroundColor: "rgba(0,0,0,0.5)",
           display: "flex",
@@ -193,9 +194,12 @@ function Home() {
             padding: "20px",
             borderRadius: "8px",
             minWidth: "300px",
-            maxWidth: "500px"
+            maxWidth: "500px",
+            maxHeight: "80vh",
+            overflowY: "auto",
           }}>
-            <h2>First Name: {actorDetails.first_name} Last Name: {actorDetails.last_name}</h2>
+            <h3>First Name: {actorDetails.first_name}</h3>
+            <h3>Last Name: {actorDetails.last_name}</h3>
             <h3>Their Top 5 Movies:</h3>
             <ul>
               {actorDetails.films && actorDetails.films.map((film, index) => (
