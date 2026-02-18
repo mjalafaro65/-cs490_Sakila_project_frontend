@@ -19,7 +19,7 @@ function Customers() {
       );
       console.log("API response:", data);
       setCustomers(data.items);
-      //setPage(data.current_page);
+      // setPage(data.current_page);
       setTotalPages(data.pages);
 
       }catch(error){
