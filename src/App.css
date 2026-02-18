@@ -98,6 +98,17 @@ button:active {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
+.search-dropdown{
+  font-family: 'Franklin Gothic', 'Verdana', Segoe UI, sans-serif;
+  font-size: 15px;
+  padding: 8px 10px;
+}
+
+.searchbar{
+  font-family: 'Franklin Gothic', 'Verdana', Segoe UI, sans-serif;
+  font-size: 15px;
+  padding: 8px 10px;
+}
 
 .popUp-overlay{
   position: fixed;

@@ -3,39 +3,23 @@ import axios from "axios";
 import "../App.css";
 
 function Films() {
-  const [searchData, setSearchData] = useState({
-    query: "",
-    genre: "",
-    actor: ""
-  });
-
+  const [searchType, setSearchType] = useState("title");
+  const [query, setQuery] = useState("");
   const [films, setFilms]= useState([]);
   const [selectedFilm, setSelectedFilm]= useState(null);
   const [error, setError]= useState("");
 
-  const handleChange= (e) => {
-    setSearchData({
-      ...searchData,
-      [e.target.name]: e.target.value
-    });
-  };
-
- const fetchFilms= async () => {
+ const fetchFilms = async () => {
     try {
       setError("");
+
       const response = await axios.get(
         "http://127.0.0.1:5000/films/search",
         {
           params: {
-            s:
-              searchData.query ||
-              searchData.genre ||
-              searchData.actor,
-            by: searchData.genre
-              ? "genre"
-              : searchData.actor
-              ? "actor"
-              : "title"}
+            s: query,
+            by: searchType
+          }
         }
       );
 
@@ -48,16 +32,14 @@ function Films() {
         }
       setFilms(data);
     } else {
-      console.error("Unexpected format:", data);
       setFilms([]);
+      setError("Unexpected response format.");
     }
-
-      setFilms(data);
-    } catch (err) {
-      console.error("Search failed:", err);
-      setError("No films found.");
-      setFilms([]);
-    }
+  } catch (err){
+    console.error("Search failed:", err);
+    setError("No films found.");
+    setFilms([]);
+   }
   };
 
   const fetchFilmDetails = async (id) => {
@@ -78,28 +60,21 @@ function Films() {
     <div>
       <h2>Search Films</h2>
 
-      <input className="searchbar"
-        type="text"
-        name="query"
-        placeholder="Search by title"
-        value={searchData.query}
-        onChange={handleChange}
-      />
+      <select 
+        value={searchType}
+        onChange={(e) => setSearchType(e.target.value)}
+        className="search-dropdown"
+      >
+        <option value="title">Title</option>
+        <option value="actor">Actor</option>
+        <option value="genre">Genre</option>
+      </select>
 
       <input className="searchbar"
         type="text"
-        name="actor"
-        placeholder="Search by actor"
-        value={searchData.actor}
-        onChange={handleChange}
-      />
-
-      <input className="searchbar"
-        type="text"
-        name="genre"
-        placeholder="Search by genre"
-        value={searchData.genre}
-        onChange={handleChange}
+        placeholder={`Search by ${searchType}`}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
 
       <button onClick={fetchFilms}>Search</button>
@@ -146,7 +121,7 @@ function Films() {
 
       )}
     </div>
-  );
+  );s
 }
 
 export default Films;
