@@ -142,10 +142,13 @@ button:active {
   top: 12px;
   right: 15px;
   border: none;
-  background: #b70303;
-  color: white;
-  font-size: 14px;
-  border-radius: 50%;
+  background: #f3f4ff;
+  color: #b70303;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30%;
   width: 28px;
   height: 28px;
   cursor: pointer;

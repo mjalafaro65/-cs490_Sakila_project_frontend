@@ -39,7 +39,7 @@ function Customers() {
   const formatEmail = (email) =>
   email.toLowerCase();
 
-
+ 
   return (
     <div>
       <h2>Customer List</h2>
