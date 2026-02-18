@@ -9,7 +9,8 @@ function Films() {
   const [selectedFilm, setSelectedFilm]= useState(null);
   const [error, setError]= useState("");
 
- const fetchFilms = async () => {
+ const fetchFilms = async (e) => {
+    if (e) e.preventDefault();
     try {
       setError("");
 
@@ -59,8 +60,8 @@ function Films() {
   return (
     <div>
       <h2>Search Films</h2>
-
-      <select 
+      <form onSubmit={fetchFilms}>
+         <select 
         value={searchType}
         onChange={(e) => setSearchType(e.target.value)}
         className="search-dropdown"
@@ -76,8 +77,10 @@ function Films() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+        <button type="submit">Search</button>
 
-      <button onClick={fetchFilms}>Search</button>
+      </form>
+      
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -121,7 +124,7 @@ function Films() {
 
       )}
     </div>
-  );s
+  );
 }
 
 export default Films;
