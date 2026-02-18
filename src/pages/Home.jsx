@@ -1,5 +1,6 @@
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../axios.jsx';
+import "../App.css";
 
 
 //runs first 
@@ -73,7 +74,7 @@ function Home() {
 
     const fetchActorDetails = async (actor_Id) => {
       try{
-        const response = await api.get(`/actors/${actor_Id}`);
+        const response = await api.get(`/actors/top/${actor_Id}`);
         setActorDetails(response.data);
         setActorPopUp(true);
 
@@ -82,12 +83,16 @@ function Home() {
       }
     }
 
+    const formatName = (name) =>
+    name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+
+
 
   return (
     <div>
       <h2>Home</h2>
       <h3>Top 5 Rented Movies</h3>
-      <table border="1" cellPadding="5" cellSpacing="0">
+      <table className="tables">
         <thead>
           <tr>
             <th>No.</th>
@@ -98,17 +103,12 @@ function Home() {
         </thead>
         <tbody>
           {films.map((film, index) => (
-            <tr key={film.film_id}>
+            <tr onClick={() => fetchFilmDetails(film.film_id)}
+            style={{ cursor: "pointer" }}
+            key={film.film_id}>
               <td>{index+1}</td>
               <td>{film.film_id}</td>
-              <td>
-                <button 
-                  onClick={() => fetchFilmDetails(film.film_id)}
-                  style={{ cursor: "pointer", background: "none", 
-                  border: "none", color: "black", textDecoration: "underline"}}> 
-                  {film.title}
-                  </button>
-                  </td>
+              <td>{formatName(film.title)}</td>
               <td>{film.rental_count}</td>
             </tr>
           ))}
@@ -116,7 +116,7 @@ function Home() {
         </table>
 
         <h3>Top 5 Actors</h3>
-      <table border="1" cellPadding="5" cellSpacing="0">
+      <table className="tables">
         <thead>
           <tr>
             <th>No.</th>
@@ -127,88 +127,48 @@ function Home() {
         </thead>
         <tbody>
           {actors.map((actor, index)=> (
-            <tr key={actor.actor_id}>
+            <tr key={actor.actor_id}
+                onClick={() => fetchActorDetails(actor.actor_id)}
+                style={{ cursor: "pointer" }}
+                  >
               <td>{index+1}</td>
               <td>{actor.actor_id}</td>
-              <td>
-              <button 
-                  onClick={() => {
-                  console.log("Actor ID clicked:", actor.actor_id);
-                  fetchActorDetails(actor.actor_id)
-                  }}
-                  style={{ cursor: "pointer", background: "none", 
-                  border: "none", color: "black", textDecoration: "underline"}}> 
-                  {actor.first_name}
-                  </button>
-              </td>
-              <td>{actor.last_name}</td>
+              <td>{formatName(actor.first_name)}</td>
+              <td>{formatName(actor.last_name)}</td>
             </tr>
           ))}
         </tbody>
         </table>
 
         {showFilmPopUp && filmDetails && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            minWidth: "300px",
-            maxWidth: "500px"
-          }}>
-            <h2>{filmDetails.title}</h2>
-            <p><strong>Release Year:</strong> {filmDetails.release_year}</p>
-            <p><strong>Description:</strong> {filmDetails.description}</p>
-            <p><strong>Rating:</strong> {filmDetails.rating}</p>
-            <button onClick={() => setFilmPopUp(false)}>Close</button>
+        <div className="popUp-overlay">
+          <div className="popUp-card">
+            <button className="close-button" onClick={() => setFilmPopUp(false)}>X</button>
+          
+            <h2 className="popUp-title">{formatName(filmDetails.title)}</h2>
+            <p><span className="label">Release Year:</span> {filmDetails.release_year}</p>
+            <p><span className="label">Description:</span> {filmDetails.description}</p>
+            <p><span className="label">Rating:</span> {filmDetails.rating}</p>
           </div>
         </div>
         )}
 
         {showActorPopUp && actorDetails && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%", 
-          height: "100%",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            minWidth: "300px",
-            maxWidth: "500px",
-            maxHeight: "80vh",
-            overflowY: "auto",
-          }}>
-            <h3>First Name: {actorDetails.first_name}</h3>
-            <h3>Last Name: {actorDetails.last_name}</h3>
-            <h3>Their Top 5 Movies:</h3>
-            <ul>
-              {actorDetails.films && actorDetails.films.map((film, index) => (
+        <div className="popUp-overlay">
+          <div className="popUp-card">
+            <button className="close-button" onClick={() => setActorPopUp(false)}>X</button>
+          
+            <h2 className="popUp-title">Details:</h2>
+            <p><span className="label">First Name:</span> {formatName(actorDetails.first_name)}</p>
+            <p><span className="label">Last Name:</span> {formatName(actorDetails.last_name)}</p>
+            <p><span className= "label" style={{textDecoration: "Underline"}}>Their Top 5 Movies:</span></p>
+            <ol>
+              {actorDetails.films && actorDetails.films.map((film) => (
               <li key={film.film_id}>
-                {index+1}.{film.title}
+                {formatName(film.title)}
               </li>
               ))}
-            </ul>
-            <button onClick={() => setActorPopUp(false)}>Close</button>
+            </ol>
           </div>
         </div>
         )}

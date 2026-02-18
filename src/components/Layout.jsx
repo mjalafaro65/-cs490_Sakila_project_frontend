@@ -5,12 +5,12 @@ function Layout() {
 
   return (
     <div>
-      <header style={{ padding: "20px", backgroundColor: "#266293b1", color: "white" }}>
-        <h1>Sakila Database Store</h1>
-        <nav style={{ marginTop: "10px" }}>
-          <Link to="/" style={{ color: "white", marginRight: "10px" }}>Home</Link>
-          <Link to="/films" style={{ color: "white", marginRight: "10px" }}>Films</Link>
-          <Link to="/customers" style={{ color: "white" }}>Customers</Link>
+      <header style={{ padding: "30px", backgroundColor: "#075d29bd", color: "white" }}>
+        <h1>SAKILA FILMS SHOP</h1>
+        <nav style={{ marginTop: "30px", display: "flex", justifyContent: "center", gap: "150px", flexWrap: "wrap"}}>
+          <Link to="/" style={{ color: "#000000", border: "1px", padding: "7px 14px", borderRadius: "6px", backgroundColor: "#f0f0f0", size: "16px" }}>Home</Link>
+          <Link to="/films" style={{  color: "#000000", border: "1px", padding: "7px 14px", borderRadius: "6px", backgroundColor: "#f0f0f0", size: "16px" }}>Films</Link>
+          <Link to="/customers" style={{  color: "#000000", border: "1px", padding: "7px 14px", borderRadius: "6px", backgroundColor: "#f0f0f0", size: "16px" }}>Customers</Link>
         </nav>
       </header>
 

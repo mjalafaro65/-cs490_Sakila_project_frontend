@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import "../App.css";
 
 function Films() {
   const [searchData, setSearchData] = useState({
@@ -70,12 +71,14 @@ function Films() {
     }
   };
 
+  const formatName = (name) =>
+  name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+
   return (
     <div>
       <h2>Search Films</h2>
 
-      {/* search bar */}
-      <input
+      <input className="searchbar"
         type="text"
         name="query"
         placeholder="Search by title"
@@ -83,7 +86,7 @@ function Films() {
         onChange={handleChange}
       />
 
-      <input
+      <input className="searchbar"
         type="text"
         name="actor"
         placeholder="Search by actor"
@@ -91,7 +94,7 @@ function Films() {
         onChange={handleChange}
       />
 
-      <input
+      <input className="searchbar"
         type="text"
         name="genre"
         placeholder="Search by genre"
@@ -103,9 +106,9 @@ function Films() {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* the returned table */}
+
       {films.length > 0 && (
-        <table border="1" cellPadding="5">
+        <table className="tables">
           <thead>
             <tr>
               <th>Title</th>
@@ -120,7 +123,7 @@ function Films() {
                 onClick={() => fetchFilmDetails(film.film_id)}
                 style={{ cursor: "pointer" }}
               >
-                <td>{film.title}</td>
+                <td>{formatName(film.title)}</td>
                 <td>{film.release_year}</td>
                 <td>{film.rating}</td>
               </tr>
@@ -129,27 +132,18 @@ function Films() {
         </table>
       )}
 
-      {/* for the pop-up */}
       {selectedFilm && (
-        <div
-          style={{
-            position: "fixed",
-            top: "20%",
-            left: "30%",
-            background: "white",
-            padding: "20px",
-            border: "1px solid black"
-          }}
-        >
-          <h3>{selectedFilm.title}</h3>
-          <p><strong>Description:</strong> {selectedFilm.description}</p>
-          <p><strong>Length:</strong> {selectedFilm.length} min</p>
-          <p><strong>Rating:</strong> {selectedFilm.rating}</p>
-
-          <button onClick={() => setSelectedFilm(null)}>
-            Close
-          </button>
+        <div className="popUp-overlay">
+          <div className="popUp-card">
+            <button className="close-button" onClick={() => setSelectedFilm(false)}>X</button>
+          
+            <h2 className="popUp-title">{formatName(selectedFilm.title)}</h2>
+            <p><span className="label">Description:</span> {selectedFilm.description}</p>
+            <p><span className="label">Length:</span> {selectedFilm.length}</p>
+            <p><span className="label">Rating:</span> {selectedFilm.rating}</p>
+          </div>
         </div>
+
       )}
     </div>
   );

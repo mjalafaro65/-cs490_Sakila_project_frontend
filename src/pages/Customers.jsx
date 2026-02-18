@@ -33,10 +33,17 @@ function Customers() {
 
   },[page]);
 
+  const formatName = (name) =>
+  name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const formatEmail = (email) =>
+  email.toLowerCase();
+
+
   return (
     <div>
-      <h3>Customer List</h3>
-      <table border="1" cellPadding="5" cellSpacing="0">
+      <h2>Customer List</h2>
+      <table className="tables">
         <thead>
           <tr>
             <th>Name</th>
@@ -47,8 +54,8 @@ function Customers() {
         <tbody>
           {customers?.map((customer) => (
             <tr key={customer.customer_id}>
-              <td>{customer.first_name} {customer.last_name}</td>
-              <td>{customer.email}</td>
+              <td>{formatName(customer.first_name)} {formatName(customer.last_name)}</td>
+              <td>{formatEmail(customer.email)}</td>
               <td>{customer.active ? "Yes" : "No"}</td>
             </tr>
           ))}
@@ -57,7 +64,7 @@ function Customers() {
 
      <br />
 
-        <button
+        <button 
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
