@@ -146,8 +146,13 @@ function Home() {
             <button className="close-button" onClick={() => setFilmPopUp(false)}>X</button>
           
             <h2 className="popUp-title">{formatName(filmDetails.title)}</h2>
-            <p><span className="label">Release Year:</span> {filmDetails.release_year}</p>
+            <p><span className="label">Film ID:</span> {filmDetails.film_id}</p>
             <p><span className="label">Description:</span> {filmDetails.description}</p>
+            <p><span className="label">Release Year:</span> {filmDetails.release_year}</p>
+            <p><span className="label">Rental Duration:</span> {filmDetails.rental_duration}</p>
+            <p><span className="label">Rental Rate:</span> {filmDetails.rental_rate}</p>
+            <p><span className="label">Length:</span> {filmDetails.length}</p>
+            <p><span className="label">Replacement Cost:</span> {filmDetails.replacement_cost}</p>
             <p><span className="label">Rating:</span> {filmDetails.rating}</p>
           </div>
         </div>
