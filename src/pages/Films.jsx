@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "../App.css";
 
@@ -8,6 +8,16 @@ function Films() {
   const [films, setFilms]= useState([]);
   const [selectedFilm, setSelectedFilm]= useState(null);
   const [error, setError]= useState("");
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+  if (query) {
+    fetchFilms();
+  }
+}, [page]);
+
 
  const fetchFilms = async () => {
     try {
@@ -18,23 +28,24 @@ function Films() {
         {
           params: {
             s: query,
-            by: searchType
+            by: searchType, 
+            page: page, 
+            per_page: perPage
           }
         }
       );
 
       const data = response.data;
       /*console.log("Backend returned:", data); -- for testing*/
+      setFilms(data.items);
+      setTotalPages(data.pages);
 
-      if (Array.isArray(data)) {
-        if (data.length === 0){
-          setError("No films found.");
-        }
-      setFilms(data);
-    } else {
-      setFilms([]);
-      setError("Unexpected response format.");
-    }
+      console.log("Backend returned:", response.data);
+
+      if (data.items.length == 0){
+        setError("No films found.");
+        setTotalPages(0);
+      }
   } catch (err){
     console.error("Search failed:", err);
     setError("No films found.");
@@ -77,7 +88,8 @@ function Films() {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      <button onClick={fetchFilms}>Search</button>
+      <button onClick={() => {setPage(1);
+                      fetchFilms();}}>Search</button>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -110,18 +122,39 @@ function Films() {
       {selectedFilm && (
         <div className="popUp-overlay">
           <div className="popUp-card">
-            <button className="close-button" onClick={() => setSelectedFilm(false)}>X</button>
+            <button className="close-button" onClick={() => setSelectedFilm(null)}>X</button>
           
             <h2 className="popUp-title">{formatName(selectedFilm.title)}</h2>
+            <p><span className="label">Film ID:</span> {selectedFilm.film_id}</p>
             <p><span className="label">Description:</span> {selectedFilm.description}</p>
+            <p><span className="label">Release Year:</span> {selectedFilm.release_year}</p>
+            <p><span className="label">Rental Duration:</span> {selectedFilm.rental_duration}</p>
+            <p><span className="label">Rental Rate:</span> {selectedFilm.rental_rate}</p>
             <p><span className="label">Length:</span> {selectedFilm.length}</p>
+            <p><span className="label">Replacement Cost:</span> {selectedFilm.replacement_cost}</p>
             <p><span className="label">Rating:</span> {selectedFilm.rating}</p>
           </div>
         </div>
-
       )}
+    <div className="films=button">
+      <button 
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+        >
+          Previous
+        </button>
+
+        <span> Page {films.length === 0 ? 0: page} of {totalPages} </span>
+
+        <button
+          disabled={page === totalPages || films.length === 0}
+          onClick={() => setPage(page + 1)}
+        >
+          Next
+      </button>
+      </div>
     </div>
-  );s
+  );
 }
 
 export default Films;

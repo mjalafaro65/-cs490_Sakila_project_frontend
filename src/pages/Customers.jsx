@@ -46,6 +46,7 @@ function Customers() {
       <table className="tables">
         <thead>
           <tr>
+            <th>Customer ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Active</th>
@@ -54,6 +55,7 @@ function Customers() {
         <tbody>
           {customers?.map((customer) => (
             <tr key={customer.customer_id}>
+              <td>{customer.customer_id}</td>
               <td>{formatName(customer.first_name)} {formatName(customer.last_name)}</td>
               <td>{formatEmail(customer.email)}</td>
               <td>{customer.active ? "Yes" : "No"}</td>

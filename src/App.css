@@ -98,6 +98,14 @@ button:active {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
+.films-button{
+  margin-top: auto; 
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+}
+
 .search-dropdown{
   font-family: 'Franklin Gothic', 'Verdana', Segoe UI, sans-serif;
   font-size: 15px;
