@@ -3,6 +3,7 @@ import axios from "axios";
 import "../App.css";
 
 function Films() {
+
   const [searchType, setSearchType] = useState("title");
   const [query, setQuery] = useState("");
   const [films, setFilms]= useState([]);
@@ -19,7 +20,8 @@ function Films() {
 }, [page]);
 
 
- const fetchFilms = async () => {
+ const fetchFilms = async (e) => {
+    if (e) e.preventDefault();
     try {
       setError("");
 
@@ -70,8 +72,8 @@ function Films() {
   return (
     <div>
       <h2>Search Films</h2>
-
-      <select 
+      <form onSubmit={fetchFilms}>
+         <select 
         value={searchType}
         onChange={(e) => setSearchType(e.target.value)}
         className="search-dropdown"
@@ -87,9 +89,10 @@ function Films() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+        <button type="submit">Search</button>
 
-      <button onClick={() => {setPage(1);
-                      fetchFilms();}}>Search</button>
+      </form>
+      
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -100,7 +103,7 @@ function Films() {
             <tr>
               <th>Title</th>
               <th>Release Year</th>
-              <th>Rating</th>
+              <th>Genre</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +115,7 @@ function Films() {
               >
                 <td>{formatName(film.title)}</td>
                 <td>{film.release_year}</td>
-                <td>{film.rating}</td>
+                <td>{film.categories[0].name}</td>
               </tr>
             ))}
           </tbody>
@@ -125,14 +128,14 @@ function Films() {
             <button className="close-button" onClick={() => setSelectedFilm(null)}>X</button>
           
             <h2 className="popUp-title">{formatName(selectedFilm.title)}</h2>
-            <p><span className="label">Film ID:</span> {selectedFilm.film_id}</p>
+               <p><span className="label">Film ID:</span> {selectedFilm.film_id}</p>
             <p><span className="label">Description:</span> {selectedFilm.description}</p>
             <p><span className="label">Release Year:</span> {selectedFilm.release_year}</p>
             <p><span className="label">Rental Duration:</span> {selectedFilm.rental_duration}</p>
             <p><span className="label">Rental Rate:</span> {selectedFilm.rental_rate}</p>
             <p><span className="label">Length:</span> {selectedFilm.length}</p>
             <p><span className="label">Replacement Cost:</span> {selectedFilm.replacement_cost}</p>
-            <p><span className="label">Rating:</span> {selectedFilm.rating}</p>
+         
           </div>
         </div>
       )}
