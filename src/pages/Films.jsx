@@ -87,7 +87,16 @@ function Films() {
         type="text"
         placeholder={`Search by ${searchType}`}
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        required
+        onChange={(e) => {
+      const value = e.target.value;
+        if (/^[A-Za-z ]*$/.test(value)) {
+          setQuery(value);
+          setError("");
+      } else {
+        setError("Invalid character");
+      }
+    }}
       />
         <button type="submit">Search</button>
 
