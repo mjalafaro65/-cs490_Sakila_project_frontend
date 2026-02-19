@@ -3,6 +3,7 @@ import axios from "axios";
 import "../App.css";
 
 function Films() {
+
   const [searchType, setSearchType] = useState("title");
   const [query, setQuery] = useState("");
   const [films, setFilms]= useState([]);
@@ -91,7 +92,7 @@ function Films() {
             <tr>
               <th>Title</th>
               <th>Release Year</th>
-              <th>Rating</th>
+              <th>Genre</th>
             </tr>
           </thead>
           <tbody>
@@ -103,7 +104,7 @@ function Films() {
               >
                 <td>{formatName(film.title)}</td>
                 <td>{film.release_year}</td>
-                <td>{film.rating}</td>
+                <td>{film.categories[0].name}</td>
               </tr>
             ))}
           </tbody>
