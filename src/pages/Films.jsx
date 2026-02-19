@@ -128,7 +128,7 @@ function Films() {
             <button className="close-button" onClick={() => setSelectedFilm(null)}>X</button>
           
             <h2 className="popUp-title">{formatName(selectedFilm.title)}</h2>
-               <p><span className="label">Film ID:</span> {selectedFilm.film_id}</p>
+            <p><span className="label">Film ID:</span> {selectedFilm.film_id}</p>
             <p><span className="label">Description:</span> {selectedFilm.description}</p>
             <p><span className="label">Release Year:</span> {selectedFilm.release_year}</p>
             <p><span className="label">Rental Duration:</span> {selectedFilm.rental_duration}</p>
@@ -139,7 +139,7 @@ function Films() {
           </div>
         </div>
       )}
-    <div className="films=button">
+    <div className="films-button">
       <button 
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
