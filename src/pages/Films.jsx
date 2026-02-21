@@ -88,7 +88,6 @@ function Films() {
         placeholder={`Search by ${searchType}`}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        required
       />
         <button type="submit">Search</button>
 
