@@ -29,7 +29,7 @@ function Films() {
         "http://127.0.0.1:5000/films/search",
         {
           params: {
-            s: query,
+            s: query.trim(),
             by: searchType, 
             page: page, 
             per_page: perPage
@@ -88,6 +88,7 @@ function Films() {
         placeholder={`Search by ${searchType}`}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        required
       />
         <button type="submit">Search</button>
 

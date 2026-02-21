@@ -10,7 +10,7 @@ function Customers() {
   useEffect(() =>{
     const fetchedCustomers= async ()=>{
       try{
-        const {data} =await api.get('/customers/list',
+        const {data} =await api.get('/customers',
         {
           params:{
             page: page, per_page: 12
