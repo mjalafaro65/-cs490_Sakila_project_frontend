@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import api from '../axios.jsx';
 import "../App.css";
 
 function Films() {
@@ -12,6 +13,22 @@ function Films() {
   const [page, setPage] = useState(1);
   const [perPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [rental, setRental] = useState(""); 
+
+  const [showRentPopup, setShowRentPopup] = useState(false);
+  const [customer_id, setCustomerId] = useState("");
+  const [selectedFilm_id, setSelectedFilmId] = useState(null);
+  const openRentPopup = (film_id) => {
+  setSelectedFilmId(film_id);
+  setCustomerId("");
+  setShowRentPopup(true);
+};
+
+  const [confirmMessage, setConfirm] = useState("");
+  const showConfirmation = (message) => {
+    setConfirm(message);     
+    setTimeout(() => setConfirm(""), 3000);
+  };
 
   useEffect(() => {
   if (query) {
@@ -19,14 +36,21 @@ function Films() {
   }
 }, [page]);
 
-
  const fetchFilms = async (e) => {
     if (e) e.preventDefault();
     try {
-      setError("");
 
-      const response = await axios.get(
-        "http://127.0.0.1:5000/films/search",
+      const inputVali = query.trim()
+
+      if (!inputVali) {
+        setError("Please enter a search item.");
+        setFilms([]);
+        setPage(0);
+        setTotalPages(0);
+        return;
+      }
+
+      const response = await api.get(`/films/search`,
         {
           params: {
             s: query.trim(),
@@ -38,33 +62,54 @@ function Films() {
       );
 
       const data = response.data;
-      /*console.log("Backend returned:", data); -- for testing*/
       setFilms(data.items);
+      setPage(1);
       setTotalPages(data.pages);
 
-      console.log("Backend returned:", response.data);
 
       if (data.items.length == 0){
         setError("No films found.");
+        setPage(0);
         setTotalPages(0);
       }
   } catch (err){
-    console.error("Search failed:", err);
-    setError("No films found.");
+    setError("Search failed.");
     setFilms([]);
    }
   };
 
   const fetchFilmDetails = async (id) => {
     try {
-      const { data } = await axios.get(
-        `http://127.0.0.1:5000/films/${id}`
+      const { data } = await api.get(
+        `/films/${id}`
       );
       setSelectedFilm(data);
     } catch (err) {
       console.error("Failed to fetch film details:", err);
     }
   };
+
+  const rentFilm= async (film_id, customer_id) =>{
+    if (!customer_id) {
+      setError("Please enter a customer ID.");
+      return;
+    }
+
+    try{
+      const response =await api.post(`/rentals`, {film_id: parseInt(film_id), customer_id: parseInt(customer_id)});  
+      console.log("Rental created:", response.data); 
+      showConfirmation("Film rented!"); 
+      setShowRentPopup(false);
+
+    } catch (error) {
+    console.error("Error renting this film", error);
+    if (error.response?.data?.error) {
+      setError(error.response.data.error);
+    } else {
+      setError("Unexpected error while renting");
+    }
+  }
+};
 
   const formatName = (name) =>
   name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -87,7 +132,16 @@ function Films() {
         type="text"
         placeholder={`Search by ${searchType}`}
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => { const value = e.target.value;
+
+          if (/^[A-Za-z\s]*$/.test(value)) {
+            setQuery(value);
+          } else {
+            setError("Invalid input, please enter letters only.");
+          }
+        }}
+
+        
       />
         <button type="submit">Search</button>
 
@@ -104,6 +158,7 @@ function Films() {
               <th>Title</th>
               <th>Release Year</th>
               <th>Genre</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -116,6 +171,14 @@ function Films() {
                 <td>{formatName(film.title)}</td>
                 <td>{film.release_year}</td>
                 <td>{film.categories[0].name}</td>
+                <td> <button onClick={(e) => {e.stopPropagation();
+                                    setSelectedFilmId(film.film_id); 
+                                    setCustomerId("");
+                                    setShowRentPopup(true);}} 
+                    style={{ cursor: "pointer", padding: "6px 12px", 
+                             borderRadius: "6px", backgroundColor: "#89023e"
+                     }}>Rent</button>
+                  </td>
               </tr>
             ))}
           </tbody>
@@ -139,6 +202,7 @@ function Films() {
           </div>
         </div>
       )}
+    
     <div className="films-button">
       <button 
           disabled={page === 1}
@@ -156,6 +220,29 @@ function Films() {
           Next
       </button>
       </div>
+
+      {showRentPopup && (
+      <div className="popUp-overlay">
+        <div className="popUp-card">
+          <button className="close-button" onClick={() => setShowRentPopup(false)}>X</button>
+          <h2>Rent Film</h2>
+          <p>Please enter the Customer ID:</p>
+          <input
+            type="number"
+            value={customer_id}
+            onChange={(e) => setCustomerId(e.target.value)}
+            placeholder="Customer ID"
+          />
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); 
+              rentFilm(selectedFilm_id, customer_id);
+            }}>
+            Rent
+          </button>
+          {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+        </div>
+      </div> )}
     </div>
   );
 }
