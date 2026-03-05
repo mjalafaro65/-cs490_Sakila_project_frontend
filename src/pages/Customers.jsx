@@ -22,6 +22,7 @@ function Customers() {
 
   const [error, setError] = useState("");
   const [errorPop, setPopUpError] = useState("");
+  const [errorPop2, setPopUp2Error] = useState(""); //make these errors work???
   const [confirmMessage, setConfirm] = useState("");
   const showConfirmation = (message) => {
     setConfirm(message);     
@@ -576,7 +577,7 @@ const returnFilmforCust = async (customer_id, film_id) => {
 
           <h2>Create New Customer</h2>
 
-           {errorPop && <p style={{ color: "red", marginTop: "10px" }}>{errorPop}</p>}
+           {errorPop2 && <p style={{ color: "red", marginTop: "10px" }}>{errorPop2}</p>}
 
           <div className="form-row">
           <input
@@ -584,11 +585,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="First Name"
             value={newCustomer.first_name}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[A-Za-z\s]*$/.test(value)) {
+              if (/^[A-Za-z\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, first_name: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter letters only.");
+                setPopUp2Error("Invalid input, please enter letters only.");
               }
             }}
           />
@@ -600,11 +601,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="Last Name"
             value={newCustomer.last_name}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[A-Za-z\s]*$/.test(value)) {
+              if (/^[A-Za-z\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, last_name: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter letters only.");
+                setPopUp2Error("Invalid input, please enter letters only.");
               }
             }}
           />
@@ -627,11 +628,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="Address"
             value={newCustomer.address}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[A-Za-z0-9-\s]*$/.test(value)) {
+              if (/^[A-Za-z0-9,\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, address: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter letters and numbers only.");
+                setPopUp2Error("Invalid input, please enter letters and numbers only.");
               }
             }}
           />
@@ -643,11 +644,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="District"
             value={newCustomer.district}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[A-Za-z0-9]*$/.test(value)) {
+              if (/^[A-Za-z0-9,\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, district: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter numbers only.");
+                setPopUp2Error("Invalid input, please enter numbers only.");
               }
             }}
           />
@@ -659,11 +660,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="Postal Code"
             value={newCustomer.postal_code}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[0-9]*$/.test(value)) {
+              if (/^[0-9\s]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, postal_code: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter numbers only.");
+                setPopUp2Error("Invalid input, please enter numbers only.");
               }
             }}
           />
@@ -675,11 +676,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="City"
             value={newCustomer.city}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[A-Za-z\s]*$/.test(value)) {
+              if (/^[A-Za-z,\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, city: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter letters only.");
+                setPopUp2Error("Invalid input, please enter letters only.");
               }
             }}
           />
@@ -691,11 +692,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="Country"
             value={newCustomer.country}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[A-Za-z\s]*$/.test(value)) {
+              if (/^[A-Za-z,\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, country: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter letters only.");
+                setPopUp2Error("Invalid input, please enter letters only.");
               }
             }}
           />
@@ -707,11 +708,11 @@ const returnFilmforCust = async (customer_id, film_id) => {
             placeholder="Phone"
             value={newCustomer.phone}
             onChange={(e) =>{const value = e.target.value;
-              if (/^[0-9-\s]*$/.test(value)) {
+              if (/^[0-9\s-]*$/.test(value)) {
                 setNewCustomer({ ...newCustomer, phone: value })
-                setPopUpError(""); 
+                setPopUp2Error(""); 
               } else {
-                setPopUpError("Invalid input, please enter numbers only.");
+                setPopUp2Error("Invalid input, please enter numbers only.");
               }
             }}
           />

@@ -63,7 +63,7 @@ function Films() {
 
       const data = response.data;
       setFilms(data.items);
-      setPage(1);
+      //setPage(1);
       setTotalPages(data.pages);
 
 
