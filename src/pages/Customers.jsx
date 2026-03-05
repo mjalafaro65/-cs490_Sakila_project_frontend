@@ -11,6 +11,15 @@ function Customers() {
   const [searchType, setSearchType] = useState("customer_id");
   const [query, setQuery] = useState("");
 
+  const [showReturnPopup, setReturnPopup] = useState(false);
+  const [film_id, setFilmId] = useState("");
+  const [selectedCustId, setSelectedCustId] = useState(null);
+  const openRentPopup = (customer_id) => {
+  setSelectedCustId(customer_id);
+  setFilmId("");
+  showReturnPopup(true);
+};
+
   const [error, setError] = useState("");
   const [errorPop, setPopUpError] = useState("");
   const [confirmMessage, setConfirm] = useState("");
@@ -64,16 +73,19 @@ function Customers() {
   },[page]);
 
 
-  const returnFilmforCust = async (customer_id, film_id) => {
-    try {
-      await api.patch(`/customers/${customer_id}/rentals/films/${film_id}/return`);
-      
-      fetchCustomerDetails(customer_id);
+const returnFilmforCust = async (customer_id, film_id) => {
+  console.log(`Attempting to return film. customer_id=${customer_id}, film_id=${film_id}`);
 
-    } catch (error) {
-      console.error("Error returning film:", error);
-    }
-  };
+  try {
+    const response = await api.patch(`/customers/${customer_id}/rentals/films/${film_id}/return`);
+    console.log(response.data); 
+    showConfirmation("Film returned successfully!");
+    fetchCustomerDetails(customer_id);
+    setReturnPopup(false);
+  } catch (err) {
+    setError(`Failed to return film: ${serverMessage}`);
+  }
+};
 
   const createCustomer = async () => {
     const trimmedCustomer = {
@@ -158,13 +170,13 @@ function Customers() {
         email: editCustomData.email?.trim() || "",
         store_id: editCustomData.store_id,
         active: editCustomData.active ? 1 : 0,
-        address: editCustomData.address?.address?.trim() || "",
-        address2: editCustomData.address?.address2?.trim() || "",
-        district: editCustomData.address?.district?.trim() || "",
-        postal_code: editCustomData.address?.postal_code?.trim() || "",
-        city: editCustomData.address?.city?.trim() || "",        
-        country: editCustomData.address?.country?.trim() || "", 
-        phone: editCustomData.address?.phone?.trim() || ""
+        address: editCustomData.address?.trim() || "",
+        address2: editCustomData.address2?.trim() || "",
+        district: editCustomData.district?.trim() || "",
+        postal_code: editCustomData.postal_code?.trim() || "",
+        city: editCustomData.city?.trim() || "",        
+        country: editCustomData.country?.trim() || "", 
+        phone: editCustomData.phone?.trim() || ""
       };
 
       console.log(payload);
@@ -178,8 +190,7 @@ function Customers() {
       setEditCustomData(null);
       showConfirmation("Customer updated successfully!");
     } catch (error) {
-      console.error("Error editing customer:", error);
-      setPopUpError(error.response?.data?.message || "Failed to update customer");
+      setPopUpError("Failed to update customer, please check all fields");
     }
   };
   
@@ -228,13 +239,18 @@ function Customers() {
   };
 
   const fetchCustomerDetails = async (customer_id) => {
-    const { data } = await api.get(`/customers/${customer_id}`);
-    setCustomerDetails({
-      ...data,
-      city: data.city || data.address?.city || "-"
-    });
-  };
+    if (!customer_id) return; 
 
+    try {
+        const { data } = await api.get(`/customers/${customer_id}`);
+        setCustomerDetails(data);
+        console.log("Fetching customer", customer_id);
+        console.log(data);
+    } catch (err) {
+        console.error("Failed to fetch customer details:", err);
+        setError("Failed to fetch customer details.");
+    }
+  }
   const formatName = (name) =>
   name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 
@@ -336,23 +352,30 @@ function Customers() {
             }}> 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", marginRight: "50px" }}>
             <h2 className="popUp-title">{formatName(customerDetails.first_name)} {formatName(customerDetails.last_name)}</h2>
-            <div style={{ display: "flex", gap: "10px"  }}>
+            <div style={{ display: "flex", gap: "3px"  }}>
               <button className = "edit" onClick={() => {setEditCustomData(customerDetails);
                                                         setCustomerDetails(null);}}>Edit</button>
               <button className = "delete" onClick={() => deleteCustomer(customerDetails.customer_id)}>Delete</button>
+              <button className = "returnFilm" onClick={(e) => {e.stopPropagation();
+                                                                setSelectedCustId(customerDetails.customer_id); 
+                                                                setFilmId("");
+                                                                setReturnPopup(true);}}>Return Film</button>
               <button className="close-button" onClick={() => setCustomerDetails(null)}>X</button>
             </div>
             </div>
+
+            {confirmMessage && <p style={{ color: "green", marginTop: "10px" }}>{confirmMessage}</p>}
+
             <p><span className="label">Customer ID:</span> {customerDetails.customer_id}</p>
             <p><span className="label">Store ID:</span> {customerDetails.store_id}</p>
             <p><span className="label">Email:</span> {formatEmail(customerDetails.email)}</p>
-            <p><span className="label">Address:</span> {customerDetails.address?.address || "-"}</p>
-            <p><span className="label">Address 2:</span> {customerDetails.address?.address2 || "-"}</p>
-            <p><span className="label">District:</span> {customerDetails.address?.district || "-"}</p>
+            <p><span className="label">Address:</span> {customerDetails.address || "-"}</p>
+            <p><span className="label">Address 2:</span> {customerDetails.address2 || "-"}</p>
+            <p><span className="label">District:</span> {customerDetails.district || "-"}</p>
             <p><span className="label">City:</span> {customerDetails.city || "-"}</p>
-            <p><span className="label">Country:</span> {customerDetails.address?.city_country?.country?.country || "-"}</p>
-            <p><span className="label">Postal Code:</span> {customerDetails.address?.postal_code || "-"}</p>
-            <p><span className="label">Phone:</span> {customerDetails.address?.phone || "-"}</p>
+            <p><span className="label">Country:</span> {customerDetails.country || "-"}</p>
+            <p><span className="label">Postal Code:</span> {customerDetails.postal_code || "-"}</p>
+            <p><span className="label">Phone:</span> {customerDetails.phone || "-"}</p>
             <p><span className="label">Active:</span> {customerDetails.active ? "Yes" : "No"}</p>
             <p><span className="label">Number of Films Returned:</span> {customerDetails.returned_count}</p>
             <p><span className="label">Number of Currently Borrowed Films:</span> {customerDetails.active_count}</p>
@@ -360,31 +383,18 @@ function Customers() {
               <table className="tables" >
                 <thead>
                   <tr>
-                    <th style={{ textAlign: "left" }}>Film</th>
-                    <th  style={{ textAlign: "center" }}>Returned</th>
-                    <th  style={{ textAlign: "center" }}></th>
+                    <th style={{ textAlign: "center" }}>Film ID</th>
+                    <th style={{ textAlign: "center" }}>Film</th>
+                    <th  style={{ textAlign: "center" }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {customerDetails?.rentals?.length > 0 ? (
-                    customerDetails.rentals.map((rental) => (
-                      <tr key={rental.rental_id} 
-                          onClick={() => fetchCustomerDetails(rental.customer_id)}
-                          style={{ cursor: "pointer" }}
-                      >
-                        <td>{formatName(rental.film_title)}</td>
-                        <td style={{ textAlign: "center" }}>{rental.returned ? "Yes" : "No"}</td>
-                        <td style={{ textAlign: "center" }}>
-                          {!rental.returned && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                returnFilmforCust(customerDetails.customer_id, rental.film_id);}}
-                            >
-                              Mark as Returned
-                            </button>
-                          )}
-                        </td>
+                  {customerDetails?.rented_films?.length > 0 ? (
+                    customerDetails.rented_films.map((rental) => (
+                      <tr key={rental.rental_id}>
+                        <th style={{ textAlign: "center" }}>{rental.film_id}</th>
+                        <td style={{ textAlign: "center" }}>{formatName(rental.title)}</td>
+                        <td style={{ textAlign: "center" }}>{rental.status === "Returned" ? "Returned" : "Active"}</td>
                       </tr>
                     ))
                   ) : (
@@ -401,64 +411,142 @@ function Customers() {
 
       {editCustomData && (
       <div className="popUp-overlay">
-        <div className="popUp-card">
+        <div className="popUp-card form-container">
           <button className="close-button" onClick={() => setEditCustomData(null)}>X</button>
           <h2>Edit Customer</h2>
 
+          <div className="form-row">
           <input
             type="text"
             placeholder="First Name"
-            value={editCustomData.first_name}
-            onChange={(e) => setEditCustomData({ ...editCustomData, first_name: e.target.value })}
+            value={formatName(editCustomData.first_name)}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z\s]*$/.test(value)) {
+                            setEditCustomData({ ...editCustomData, first_name: e.target.value })
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <input
             type="text"
             placeholder="Last Name"
-            value={editCustomData.last_name}
-            onChange={(e) => setEditCustomData({ ...editCustomData, last_name: e.target.value })}
+            value={formatName(editCustomData.last_name)}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z\s]*$/.test(value)) {
+                            setEditCustomData({ ...editCustomData, last_name: e.target.value })
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <input
             type="email"
             placeholder="Email"
-            value={editCustomData.email}
+            value={formatEmail(editCustomData.email)}
             onChange={(e) => setEditCustomData({ ...editCustomData, email: e.target.value })}
-          />
+          /></div>
+          <div className="form-row">
           <input
             type="text"
             placeholder="Address"
-            value={editCustomData.address?.address}
-            onChange={(e) => setEditCustomData({...editCustomData, address: {...editCustomData.address, address: e.target.value}})}
-          />
+            value={editCustomData.address}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z0-9-\s]*$/.test(value)) {
+                            setEditCustomData({...editCustomData, address: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters and numbers only.");
+                  }}}
+          /></div>
+          <div className="form-row">
+          <input
+            type="text"
+            placeholder="Address 2"
+            value={editCustomData.address2}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z0-9-\s]*$/.test(value)) {
+                            setEditCustomData({...editCustomData, address2: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters and numbers only.");
+                  }}}
+          /></div>
+          <div className="form-row">
           <input
             type="text"
             placeholder="District"
-            value={editCustomData.address?.district}
-            onChange={(e) => setEditCustomData({...editCustomData, address: {...editCustomData.address, district: e.target.value}})}
+            value={editCustomData.district}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z0-9-\s]*$/.test(value)) {
+                            setEditCustomData({...editCustomData, district: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters and numbers only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <input
             type="number"
             placeholder="Postal Code"
-            value={editCustomData.address?.postal_code}
-            onChange={(e) => setEditCustomData({...editCustomData, address: {...editCustomData.address, postal_code: e.target.value}})}
+            value={editCustomData.postal_code}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z0-9-\s]*$/.test(value)) {
+                            setEditCustomData({...editCustomData, postal_code: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters and numbers only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <input
             type="text"
             placeholder="City"
             value={editCustomData.city || ""}
-            onChange={(e) => setEditCustomData({...editCustomData, address: {...editCustomData.address, city: e.target.value}})}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z\s]*$/.test(value)) {
+                            setEditCustomData({ ...editCustomData, city: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <input
             type="text"
             placeholder="Country"
-            value={editCustomData.address?.city_country?.country?.country || ""}
-            onChange={(e) => setEditCustomData({...editCustomData, address: {...editCustomData.address, country: e.target.value}})}
+            value={editCustomData.country || ""}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[A-Za-z-\s]*$/.test(value)) {
+                            setEditCustomData({...editCustomData, country: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter letters only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <input
             type="text"
             placeholder="Phone"
-            value={editCustomData.address?.phone}
-            onChange={(e) => setEditCustomData({...editCustomData, address: {...editCustomData.address, phone: e.target.value}})}
+            value={editCustomData.phone}
+            onChange={(e) => {const value = e.target.value;
+                      if (/^[0-9-\s]*$/.test(value)) {
+                            setEditCustomData({...editCustomData, phone: e.target.value})
+                            setPopUpError(""); 
+                          } else {
+                            setPopUpError("Invalid input, please enter numbers only.");
+                  }}}
           />
+          </div>
+          <div className="form-row">
           <label>
             Active: 
             <input
@@ -468,6 +556,9 @@ function Customers() {
             />
           </label>
 
+          {errorPop && <p style={{ color: "red", marginTop: "10px" }}>{errorPop}</p>}
+           </div>
+
           <button onClick={() => saveEditedCustomer(editCustomData.customer_id)}>Save Changes</button>
         </div>
       </div>
@@ -475,7 +566,7 @@ function Customers() {
 
       {createPopup && (
       <div className="popUp-overlay">
-        <div className="popUp-card">
+        <div className="popUp-card form-container">
           <button 
             className="close-button"
             onClick={() => setCreatePopup(false)}
@@ -485,6 +576,9 @@ function Customers() {
 
           <h2>Create New Customer</h2>
 
+           {errorPop && <p style={{ color: "red", marginTop: "10px" }}>{errorPop}</p>}
+
+          <div className="form-row">
           <input
             type="text"
             placeholder="First Name"
@@ -498,7 +592,9 @@ function Customers() {
               }
             }}
           />
+          </div>
 
+          <div className="form-row">
           <input
             type="text"
             placeholder="Last Name"
@@ -512,7 +608,9 @@ function Customers() {
               }
             }}
           />
-
+          </div>
+          
+          <div className="form-row">
           <input
             type="email"
             placeholder="Email"
@@ -521,7 +619,9 @@ function Customers() {
               setNewCustomer({ ...newCustomer, email: e.target.value })
             }
           />
+          </div>
 
+          <div className="form-row">
           <input
             type="text"
             placeholder="Address"
@@ -535,7 +635,9 @@ function Customers() {
               }
             }}
           />
+          </div>
 
+          <div className="form-row">
           <input
             type="text"
             placeholder="District"
@@ -549,7 +651,9 @@ function Customers() {
               }
             }}
           />
+          </div>
 
+          <div className="form-row">
           <input
             type="text"
             placeholder="Postal Code"
@@ -563,7 +667,9 @@ function Customers() {
               }
             }}
           />
+          </div>
           
+          <div className="form-row">
           <input
             type="text"
             placeholder="City"
@@ -577,7 +683,9 @@ function Customers() {
               }
             }}
           />
+          </div>
 
+          <div className="form-row">
           <input
             type="text"
             placeholder="Country"
@@ -591,9 +699,11 @@ function Customers() {
               }
             }}
           />
+          </div>
 
+        <div className="form-row">
           <input
-            type="tel"
+            type="text"
             placeholder="Phone"
             value={newCustomer.phone}
             onChange={(e) =>{const value = e.target.value;
@@ -605,13 +715,36 @@ function Customers() {
               }
             }}
           />
-
-          {errorPop && <p style={{ color: "red", marginTop: "10px" }}>{errorPop}</p>}
+        </div>
 
           <button onClick={createCustomer}>Submit</button>
         </div>
       </div>
       )}
+
+      {showReturnPopup && (
+      <div className="popUp-overlay">
+        <div className="popUp-card">
+          <button className="close-button" onClick={() => setReturnPopup(false)}>X</button>
+          <h2>Return Film</h2>
+          <p>Please enter film ID:</p>
+          <input
+            type="number"
+            value={film_id}
+            onChange={(e) => setFilmId(e.target.value)}
+            placeholder="Film Id"
+          />
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); 
+              returnFilmforCust(selectedCustId, film_id);
+            }}>
+            Return Film
+          </button>
+          {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+        </div>
+      </div> )}
+
     </div>
 
       

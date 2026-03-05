@@ -89,14 +89,19 @@ function Films() {
     }
   };
 
-  const rentFilm= async (film_id, customer_id) =>{
+  const rentFilm= async (inventory_id, customer_id) =>{
     if (!customer_id) {
       setError("Please enter a customer ID.");
       return;
     }
 
     try{
-      const response =await api.post(`/rentals`, {film_id: parseInt(film_id), customer_id: parseInt(customer_id)});  
+
+      console.log("Renting film payload:", {
+        inventory_id: Number(selectedFilm_id),
+        customer_id: Number(customer_id)
+      });
+      const response =await api.post(`/rentals`, {inventory_id: parseInt(inventory_id), customer_id: parseInt(customer_id)});  
       console.log("Rental created:", response.data); 
       showConfirmation("Film rented!"); 
       setShowRentPopup(false);
@@ -146,8 +151,13 @@ function Films() {
         <button type="submit">Search</button>
 
       </form>
-      
 
+      {confirmMessage && (
+        <p style={{ color: "green", marginTop: "10px" }}>
+          {confirmMessage}
+        </p>
+      )}
+      
       {error && <p style={{ color: "red" }}>{error}</p>}
 
 
